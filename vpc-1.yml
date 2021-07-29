@@ -1,0 +1,93 @@
+Description: Template Final-Project Trambo
+
+#Parameters:
+
+Resources:
+  #------------------------------
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 60.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: vpc-cr
+  #------------------------------
+  IG:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: ig-cr
+  #------------------------------
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref IG
+  #------------------------------
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn: VPC
+    Properties:
+      GroupDescription: Allow http to client host
+      GroupName: securitygroupcr
+      Tags:
+        - Key: Name
+          Value: sg-cr
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+  #------------------------------
+  Subnet1CR:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-west-2a
+      VpcId: !Ref VPC
+      CidrBlock: 60.0.1.0/24
+      Tags:
+        - Key: Name
+          Value: Subnet1-cr
+
+  Subnet2CR:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-west-2c
+      VpcId: !Ref VPC
+      CidrBlock: 60.0.2.0/24
+      Tags:
+        - Key: Name
+          Value: Subnet2-cr
+  #------------------------------
+  RouteTableCR:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: rt-cr
+  #------------------------------
+  RTSubnet1Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet1CR
+      RouteTableId: !Ref RouteTableCR
+
+  RTSubnet2Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet2CR
+      RouteTableId: !Ref RouteTableCR
+  #------------------------------
+  RouteCR:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTableCR
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IG
+  #------------------------------
