@@ -1,0 +1,148 @@
+Description: Template Homework No. 4
+
+#Parameters:
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 60.0.0.0/16
+      Tags:
+        - Key: Name
+          Value: vpc-cr
+
+  IG:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: ig-cr
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref IG
+
+  #PRIVATES
+
+  SubnetPriv1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-west-2a
+      VpcId: !Ref VPC
+      CidrBlock: 60.0.1.0/24
+      Tags:
+        - Key: Name
+          Value: priv1-cr
+
+  SubnetPriv2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-west-2a
+      VpcId: !Ref VPC
+      CidrBlock: 60.0.2.0/24
+      Tags:
+        - Key: Name
+          Value: priv2-cr
+
+  SubnetPriv3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-west-2a
+      VpcId: !Ref VPC
+      CidrBlock: 60.0.3.0/24
+      Tags:
+        - Key: Name
+          Value: priv3-cr
+
+  RouteTablePrivate:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: rt-priv-cr
+
+  RTSubnetPriv1Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetPriv1
+      RouteTableId: !Ref RouteTablePrivate
+
+  RTSubnetPriv2Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetPriv2
+      RouteTableId: !Ref RouteTablePrivate
+
+  RTSubnetPriv31Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetPriv3
+      RouteTableId: !Ref RouteTablePrivate
+
+  # PUBLICS
+
+  SubnetPbc1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-west-2a
+      VpcId: !Ref VPC
+      CidrBlock: 60.0.4.0/24
+      Tags:
+        - Key: Name
+          Value: pbc1-cr
+
+  SubnetPbc2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-west-2a
+      VpcId: !Ref VPC
+      CidrBlock: 60.0.5.0/24
+      Tags:
+        - Key: Name
+          Value: pbc2-cr
+
+  SubnetPbc3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-west-2a
+      VpcId: !Ref VPC
+      CidrBlock: 60.0.6.0/24
+      Tags:
+        - Key: Name
+          Value: pbc3-cr
+
+  RouteTablePublic:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: rt-pbc-cr
+
+  RTSubnetPbc1Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetPbc1
+      RouteTableId: !Ref RouteTablePublic
+
+  RTSubnetPbc2Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetPbc2
+      RouteTableId: !Ref RouteTablePublic
+
+  RTSubnetPbc3Association:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetPbc3
+      RouteTableId: !Ref RouteTablePublic
+
+  RoutePublic:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTablePublic
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IG
